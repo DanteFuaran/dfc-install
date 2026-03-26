@@ -57,7 +57,6 @@ while true; do
     ) &
     _cpid=$!
     _si=0
-    printf "\n"
     while kill -0 "$_cpid" 2>/dev/null; do
         printf "\r${GREEN}${_spin[$((_si % 10))]}${NC}  Поиск ключа активации"
         _si=$((_si + 1))
@@ -68,6 +67,7 @@ while true; do
     printf "\r\033[K"
 
     if [ "$_STATUS" = "200" ]; then
+        echo
         echo -e "${GREEN}✅ Ключ успешно активирован!${NC}"
         tput cnorm 2>/dev/null
         echo
