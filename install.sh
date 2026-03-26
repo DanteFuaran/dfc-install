@@ -59,7 +59,7 @@ while true; do
     _si=0
     printf "\n"
     while kill -0 "$_cpid" 2>/dev/null; do
-        printf "\r${GREEN}${_spin[$((_si % 10))]}${NC}   Поиск ключа активации"
+        printf "\r${GREEN}${_spin[$((_si % 10))]}${NC}  Поиск ключа активации"
         _si=$((_si + 1))
         sleep 0.08
     done
@@ -75,7 +75,8 @@ while true; do
         break
     fi
 
-    echo -e "${RED}✖${NC}   Неверный ключ или нет доступа."
+    echo
+    echo -e "${RED}✖${NC}  Неверный ключ или нет доступа."
     echo -e "${BLUE}══════════════════════════════════════${NC}"
     printf "   ${DARKGRAY}${BLUE}Enter${DARKGRAY}: Повторить    ${BLUE}Esc${DARKGRAY}: Выход${NC}"
     tput cnorm 2>/dev/null
