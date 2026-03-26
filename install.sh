@@ -7,6 +7,17 @@ BLUE='\033[0;34m'
 DARKGRAY='\033[1;30m'
 NC='\033[0m'
 
+trap 'printf "\033[0m"; tput cnorm 2>/dev/null' EXIT
+
+_cancel_exit() {
+    printf "\033[0m\n"
+    echo
+    echo -e "${RED}Скрипт остановлен пользователем...${NC}"
+    echo
+    tput cnorm 2>/dev/null
+    exit 0
+}
+
 _ACCESS_KEY=""
 _read_key() {
     local input="" char
@@ -26,9 +37,7 @@ _read_key() {
             done
             # Чистый Esc (нет дальнейшей последовательности) — выход
             if [[ -z "${_sc:-}" ]]; then
-                printf "\033[0m\n"
-                tput cnorm 2>/dev/null
-                exit 0
+                _cancel_exit
             fi
         else
             input+="$char"
@@ -63,6 +72,7 @@ while true; do
     ) &
     _cpid=$!
     _si=0
+    echo
     while kill -0 "$_cpid" 2>/dev/null; do
         printf "\r${GREEN}${_spin[$((_si % 10))]}${NC}  Поиск ключа активации"
         _si=$((_si + 1))
@@ -73,7 +83,6 @@ while true; do
     printf "\r\033[K\033[0m"
 
     if [ "$_STATUS" = "200" ]; then
-        echo
         echo -e "${GREEN}✅ Ключ успешно активирован!${NC}"
         tput cnorm 2>/dev/null
         echo
@@ -87,10 +96,7 @@ while true; do
 
     IFS= read -rsn1 _nav 2>/dev/null || _nav=""
     if [[ "$_nav" == $'\x1b' ]]; then
-        printf "\n"
-        printf "\033[0m"
-        tput cnorm 2>/dev/null
-        exit 0
+        _cancel_exit
     fi
 
     # Enter: восстановить позицию курсора и очистить до конца экрана
