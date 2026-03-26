@@ -1,12 +1,12 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/DanteFuaran/dfc-manager/main/assets/logo.jpg" alt="DFC Manager" width="100%">
+  <img src="assets/logo.jpg" alt="DFC Manager" width="100%">
 </p>
 
 <p align="center">
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-0.2.0-blue?style=flat-square" alt="version"/>
+  <img src="https://img.shields.io/badge/version-0.0.9-blue?style=flat-square" alt="version"/>
   <img src="https://img.shields.io/badge/platform-Ubuntu%20%7C%20Debian-orange?style=flat-square" alt="platform"/>
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="license"/>
 </p>
