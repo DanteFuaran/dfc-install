@@ -45,10 +45,12 @@ _read_key() {
         fi
     done
     printf "\033[0m\n"
+    tput civis 2>/dev/null
     _ACCESS_KEY="$input"
 }
 
 clear
+tput civis 2>/dev/null
 echo -e "${BLUE}══════════════════════════════════════${NC}"
 echo -e "     🛡️  DFC Manager — Установка"
 echo -e "${BLUE}══════════════════════════════════════${NC}"
@@ -90,9 +92,10 @@ while true; do
     fi
 
     echo -e "${RED}✖${NC}  Неверный ключ или нет доступа."
+    echo
     echo -e "${BLUE}══════════════════════════════════════${NC}"
     printf "   ${DARKGRAY}${BLUE}Enter${DARKGRAY}: Повторить    ${BLUE}Esc${DARKGRAY}: Выход${NC}"
-    tput cnorm 2>/dev/null
+    tput civis 2>/dev/null
 
     IFS= read -rsn1 _nav 2>/dev/null || _nav=""
     if [[ "$_nav" == $'\x1b' ]]; then
