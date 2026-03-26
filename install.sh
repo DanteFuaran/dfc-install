@@ -68,7 +68,6 @@ while true; do
     printf "\r\033[K"
 
     if [ "$_STATUS" = "200" ]; then
-        echo
         echo -e "${GREEN}✅ Ключ успешно активирован!${NC}"
         tput cnorm 2>/dev/null
         echo
