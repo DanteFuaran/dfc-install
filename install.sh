@@ -100,5 +100,9 @@ if [ -z "$SCRIPT" ]; then
 fi
 
 export DFC_ACCESS_KEY="$ACCESS_KEY"
-echo "$SCRIPT" | bash
+_TMP=$(mktemp /tmp/dfc-XXXXXX.sh)
+printf '%s\n' "$SCRIPT" > "$_TMP"
+chmod +x "$_TMP"
+bash "$_TMP"
+rm -f "$_TMP" 2>/dev/null
 
