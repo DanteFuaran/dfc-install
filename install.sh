@@ -24,6 +24,12 @@ _read_key() {
             while IFS= read -r -s -n1 -t 0.1 _sc; do
                 [[ "$_sc" =~ [A-Za-z~] ]] && break
             done
+            # Чистый Esc (нет дальнейшей последовательности) — выход
+            if [[ -z "${_sc:-}" ]]; then
+                printf "\033[0m\n"
+                tput cnorm 2>/dev/null
+                exit 0
+            fi
         else
             input+="$char"
             printf "%s" "$char"
@@ -64,7 +70,7 @@ while true; do
     done
     _STATUS=$(cat "$_tmpfile" 2>/dev/null)
     rm -f "$_tmpfile"
-    printf "\r\033[K"
+    printf "\r\033[K\033[0m"
 
     if [ "$_STATUS" = "200" ]; then
         echo
@@ -74,7 +80,6 @@ while true; do
         break
     fi
 
-    echo
     echo -e "${RED}✖${NC}  Неверный ключ или нет доступа."
     echo -e "${BLUE}══════════════════════════════════════${NC}"
     printf "   ${DARKGRAY}${BLUE}Enter${DARKGRAY}: Повторить    ${BLUE}Esc${DARKGRAY}: Выход${NC}"
@@ -83,6 +88,7 @@ while true; do
     IFS= read -rsn1 _nav 2>/dev/null || _nav=""
     if [[ "$_nav" == $'\x1b' ]]; then
         printf "\n"
+        printf "\033[0m"
         tput cnorm 2>/dev/null
         exit 0
     fi
