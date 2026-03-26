@@ -4,70 +4,93 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+DARKGRAY='\033[1;30m'
 NC='\033[0m'
 
+_ACCESS_KEY=""
 _read_key() {
-    local prompt="$1"
-    local var_name="$2"
-    local input=""
-    local char
+    local input="" char
     tput cnorm 2>/dev/null
-    echo -en "${BLUE}➜${NC}  ${YELLOW}${prompt}${NC} \033[32m"
+    printf "${BLUE}➜${NC}  ${YELLOW}Введите ключ доступа:${NC} \033[32m"
     while IFS= read -r -s -n1 char; do
         if [[ -z "$char" ]]; then
             break
         elif [[ "$char" == $'\x7f' ]] || [[ "$char" == $'\x08' ]]; then
             if [[ -n "$input" ]]; then
                 input="${input%?}"
-                echo -en "\b \b"
+                printf "\b \b"
             fi
         elif [[ "$char" == $'\x1b' ]]; then
-            local _seq=""
             while IFS= read -r -s -n1 -t 0.1 _sc; do
-                _seq+="$_sc"
                 [[ "$_sc" =~ [A-Za-z~] ]] && break
             done
         else
             input+="$char"
-            echo -en "$char"
+            printf "%s" "$char"
         fi
     done
-    echo -en "\033[0m"
-    echo
-    printf -v "$var_name" '%s' "$input"
+    printf "\033[0m\n"
+    _ACCESS_KEY="$input"
 }
 
 clear
 echo -e "${BLUE}══════════════════════════════════════${NC}"
-echo -e "        DFC Manager — Установка"
+echo -e "    🛡️  DFC Manager — Установка"
 echo -e "${BLUE}══════════════════════════════════════${NC}"
 echo
 
-_read_key "Введите ключ доступа:" ACCESS_KEY
-echo
+_spin=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
 
-if [ -z "$ACCESS_KEY" ]; then
-    echo -e "${RED}Ключ не может быть пустым.${NC}"
-    exit 1
-fi
+while true; do
+    printf "\033[s"   # сохранить позицию курсора (перед строкой ввода)
+    _read_key
+    ACCESS_KEY="$_ACCESS_KEY"
 
-echo -e "Проверка ключа..."
+    # Спиннер пока идёт проверка
+    _tmpfile=$(mktemp)
+    tput civis 2>/dev/null
+    ( curl -s -o /dev/null -w "%{http_code}" \
+        -H "Authorization: Bearer ${ACCESS_KEY}" \
+        -H "Accept: application/vnd.github.v3+json" \
+        "https://api.github.com/repos/DanteFuaran/dfc-manager/contents/dfc-manager.sh" \
+        > "$_tmpfile" 2>/dev/null
+    ) &
+    _cpid=$!
+    _si=0
+    while kill -0 "$_cpid" 2>/dev/null; do
+        printf "\r   ${GREEN}${_spin[$((_si % 10))]}${NC}  Проверка ключа..."
+        _si=$((_si + 1))
+        sleep 0.08
+    done
+    _STATUS=$(cat "$_tmpfile" 2>/dev/null)
+    rm -f "$_tmpfile"
+    printf "\r\033[K"
 
-STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-    -H "Authorization: token ${ACCESS_KEY}" \
-    -H "Accept: application/vnd.github.v3+json" \
-    "https://api.github.com/repos/DanteFuaran/dfc-manager/contents/dfc-manager.sh")
+    if [ "$_STATUS" = "200" ]; then
+        echo -e "   ${GREEN}✅${NC}  Ключ принят. Загрузка..."
+        tput cnorm 2>/dev/null
+        echo
+        break
+    fi
 
-if [ "$STATUS" != "200" ]; then
-    echo -e "${RED}Неверный ключ или нет доступа.${NC}"
-    exit 1
-fi
+    echo -e "   ${RED}✖${NC}  Неверный ключ или нет доступа."
+    echo -e "${BLUE}══════════════════════════════════════${NC}"
+    printf "   ${DARKGRAY}${BLUE}Enter${DARKGRAY}: Повторить    ${BLUE}Esc${DARKGRAY}: Выход${NC}"
+    tput cnorm 2>/dev/null
 
-echo -e "${GREEN}Ключ принят. Загрузка...${NC}"
-echo
+    IFS= read -rsn1 _nav 2>/dev/null || _nav=""
+    if [[ "$_nav" == $'\x1b' ]]; then
+        printf "\n"
+        tput cnorm 2>/dev/null
+        exit 0
+    fi
+
+    # Enter: восстановить позицию курсора и очистить до конца экрана
+    printf "\033[u\033[J"
+done
 
 SCRIPT=$(curl -s \
-    -H "Authorization: token ${ACCESS_KEY}" \
+    -H "Authorization: Bearer ${ACCESS_KEY}" \
     -H "Accept: application/vnd.github.v3.raw" \
     "https://api.github.com/repos/DanteFuaran/dfc-manager/contents/dfc-manager.sh")
 
@@ -78,3 +101,4 @@ fi
 
 export DFC_ACCESS_KEY="$ACCESS_KEY"
 echo "$SCRIPT" | bash
+
