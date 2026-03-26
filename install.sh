@@ -8,6 +8,7 @@ DARKGRAY='\033[1;30m'
 NC='\033[0m'
 
 trap 'printf "\033[0m"; tput cnorm 2>/dev/null' EXIT
+trap '_cancel_exit' INT TERM
 
 _cancel_exit() {
     printf "\033[0m\n"
