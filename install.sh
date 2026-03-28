@@ -121,7 +121,7 @@ export DFC_ACCESS_KEY="$ACCESS_KEY"
 _TMP=$(mktemp /tmp/dfc-XXXXXX.sh)
 printf '%s\n' "$SCRIPT" > "$_TMP"
 chmod +x "$_TMP"
-trap '' INT TERM
+trap - INT TERM
 bash "$_TMP"
 rm -f "$_TMP" 2>/dev/null
 
