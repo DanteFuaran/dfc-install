@@ -120,8 +120,12 @@ fi
 export DFC_ACCESS_KEY="$ACCESS_KEY"
 _TMP=$(mktemp /tmp/dfc-XXXXXX.sh)
 printf '%s\n' "$SCRIPT" > "$_TMP"
+_STTY_SAVED=$(stty -g 2>/dev/null || true)
 chmod +x "$_TMP"
 trap - INT TERM
 bash "$_TMP"
+_exit=$?
+if [ -n "$_STTY_SAVED" ]; then stty "$_STTY_SAVED" 2>/dev/null || stty sane 2>/dev/null || true; else stty sane 2>/dev/null || true; fi
+stty echo echoe icanon 2>/dev/null || true
 rm -f "$_TMP" 2>/dev/null
 
