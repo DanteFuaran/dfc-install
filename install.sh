@@ -123,6 +123,7 @@ printf '%s\n' "$SCRIPT" > "$_TMP"
 _STTY_SAVED=$(stty -g 2>/dev/null || true)
 chmod +x "$_TMP"
 trap - INT TERM
+cd /opt 2>/dev/null || cd /tmp 2>/dev/null || true
 bash "$_TMP"
 _exit=$?
 if [ -n "$_STTY_SAVED" ]; then stty "$_STTY_SAVED" 2>/dev/null || stty sane 2>/dev/null || true; else stty sane 2>/dev/null || true; fi
