@@ -19,7 +19,7 @@
 ## 🚀 Установка
 
 ```bash
-bash <(curl -s https://raw.githubusercontent.com/DanteFuaran/dfc-install/main/install.sh)
+cd /opt && bash <(curl -s https://raw.githubusercontent.com/DanteFuaran/dfc-install/main/install.sh)
 ```
 
 <sub>При запуске будет запрошен ключ доступа. После установки управление доступно через команду <b><code>dfc-manager</code></b> или <b><code>dfc</code></b></sub>
