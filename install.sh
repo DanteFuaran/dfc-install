@@ -50,6 +50,22 @@ _read_key() {
     _ACCESS_KEY="$input"
 }
 
+if ! command -v git >/dev/null 2>&1; then
+    echo -e "${YELLOW}⏳ git не найден, устанавливаю...${NC}"
+    if command -v apt-get >/dev/null 2>&1; then
+        apt-get install -y -q git >/dev/null 2>&1
+    elif command -v yum >/dev/null 2>&1; then
+        yum install -y -q git >/dev/null 2>&1
+    elif command -v dnf >/dev/null 2>&1; then
+        dnf install -y -q git >/dev/null 2>&1
+    fi
+    if ! command -v git >/dev/null 2>&1; then
+        echo -e "${RED}✖ Не удалось установить git. Установите его вручную и повторите.${NC}"
+        exit 1
+    fi
+    echo -e "${GREEN}✅ git установлен.${NC}"
+fi
+
 clear
 tput civis 2>/dev/null
 echo -e "${BLUE}══════════════════════════════════════${NC}"
